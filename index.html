@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B0D26">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LIFT LOG">
+<title>LIFT LOG</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-512.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@1,600;1,700&family=M+PLUS+1p:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#0B0D26;--panel:#14173A;--line:#2A2F63;--tx:#EEF0FF;--mu:#9AA0D0;--cy:#3DF2E0;--cyi:#06231F;--lv:#B9A8FF;--lvi:#1E1B4B;--dg:#FF8A8A;--dash:#5A62B0}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:'M PLUS 1p','Helvetica Neue',Arial,sans-serif;-webkit-text-size-adjust:100%}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+.num{font-family:'Chakra Petch','Arial Narrow',sans-serif;font-style:italic;font-weight:700}
+.cy{color:var(--cy)}.mu{color:var(--mu)}
+.screen{max-width:480px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 20px) 20px calc(env(safe-area-inset-bottom) + 110px);display:flex;flex-direction:column;gap:14px;min-height:100vh;min-height:100dvh}
+.screen.form{padding-bottom:calc(env(safe-area-inset-bottom) + 24px)}
+.center{align-items:center;justify-content:center}
+.head{display:flex;justify-content:space-between;align-items:flex-end}
+.logo{margin:0;font-size:44px;line-height:.95;letter-spacing:-.01em}
+.date{font-size:14px;color:var(--mu);font-weight:600;padding-bottom:4px}
+.chips{display:flex;gap:6px;margin:0 -20px;padding:0 20px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;height:44px;padding:0 14px;border:1px solid var(--line);border-radius:6px;color:var(--mu);font-size:13px}
+.chip.on{background:var(--tx);border-color:var(--tx);color:var(--bg);font-weight:700}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{height:132px;border-radius:16px;background:var(--panel);border:1px solid var(--line);padding:14px;display:flex;flex-direction:column;justify-content:space-between;align-items:stretch;text-align:left;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;min-width:0}
+.tile .col{display:flex;flex-direction:column;gap:2px;min-width:0}
+.tile .nm{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile .cat{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--mu)}
+.tile .big{font-size:40px;line-height:.9}
+.tile .u{font-size:14px;color:var(--mu)}
+.tile .sub{font-size:12px;color:var(--mu)}
+.tile.today{background:var(--cy);border-color:var(--cy);color:var(--cyi)}
+.tile.today .cat,.tile.today .u,.tile.today .sub{color:var(--cyi)}
+.tile.today .sub{font-weight:500}
+.tile.add{background:transparent;border:1.5px dashed var(--dash);align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:700}
+.empty{grid-column:1/-1;font-size:13px;color:var(--mu);padding:8px 2px}
+.stretch{height:84px;border-radius:16px;background:rgba(185,168,255,.22);border:1px solid rgba(185,168,255,.45);color:#E4DDFF;padding:0 16px 0 18px;display:flex;justify-content:space-between;align-items:center}
+.stretch .t{font-size:20px;font-weight:500}
+.switch{width:76px;height:44px;border-radius:22px;background:rgba(185,168,255,.25);padding:4px;display:flex;align-items:center;justify-content:flex-start}
+.switch .knob{width:36px;height:36px;border-radius:50%;background:#E4DDFF;display:flex;align-items:center;justify-content:center}
+.switch.on{background:var(--lv);justify-content:flex-end}
+.switch.on .knob{background:var(--lvi)}
+.tabbar{position:fixed;left:0;right:0;bottom:0;padding:8px 20px calc(env(safe-area-inset-bottom) + 16px);background:var(--bg);z-index:5}
+.tabs{max-width:440px;margin:0 auto;height:60px;border-radius:16px;background:var(--panel);border:1px solid var(--line);padding:6px;display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.tabs button{border-radius:11px;color:var(--mu);font-size:13px}
+.tabs button.on{background:var(--tx);color:var(--bg);font-weight:700}
+.back{display:flex;align-items:center;gap:6px;height:44px;font-size:14px;color:var(--mu);align-self:flex-start;padding-right:8px}
+.titlerow{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+h1.t{margin:0;font-size:26px;font-weight:700}
+.panel{border-radius:16px;background:var(--panel);border:1px solid var(--line)}
+.btn{height:54px;border-radius:16px;background:var(--cy);color:var(--cyi);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;width:100%}
+.btn[disabled]{opacity:.5}
+.btn.danger{background:transparent;border:1px solid var(--dg);color:var(--dg);font-size:14px}
+.btn.dash{height:52px;border:1.5px dashed var(--dash);border-radius:14px;background:transparent;color:var(--tx);font-size:14px;gap:8px}
+.actions{margin-top:auto;display:grid;grid-template-columns:120px 1fr;gap:10px}
+.actions.one{grid-template-columns:1fr}
+.label{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--mu)}
+.fieldset{display:flex;flex-direction:column;gap:8px}
+.field{height:56px;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:0 16px;font-size:17px;font-weight:700;width:100%;outline:none;-webkit-appearance:none;appearance:none}
+.field:focus{border-color:var(--cy)}
+.datefield{height:44px;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:0 12px;font-family:'Chakra Petch',sans-serif;font-style:italic;font-weight:600;font-size:14px;color:var(--tx);color-scheme:dark;min-width:0}
+.sethead,.setrow{display:grid;grid-template-columns:30px 1fr 1fr 44px;gap:8px;align-items:center}
+.sethead{font-size:11px;letter-spacing:.08em;color:var(--mu);padding:0 2px}
+.setno{font-size:22px;color:var(--mu)}
+.setno.max{color:var(--cy)}
+.setin{height:56px;min-width:0;width:100%;border:1px solid var(--line);border-radius:14px;background:var(--panel);text-align:center;font-family:'Chakra Petch',sans-serif;font-style:italic;font-weight:700;font-size:26px;outline:none;-webkit-appearance:none;appearance:none}
+.setin:focus{border-color:var(--cy)}
+.setin.max{border:2px solid var(--cy);color:var(--cy)}
+.x{width:44px;height:44px;border-radius:14px;color:var(--mu);display:flex;align-items:center;justify-content:center}
+.sumcard{padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.seg{display:flex;gap:8px}
+.seg button{height:44px;padding:0 20px;border:1px solid var(--line);border-radius:6px;color:var(--mu);font-size:13px}
+.seg button.on{background:var(--cy);border-color:var(--cy);color:var(--cyi);font-weight:700}
+.rows{display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:64px minmax(0,1fr) auto 30px;align-items:center;min-height:44px;border-bottom:1px solid var(--line);font-size:14px;text-align:left;width:100%;gap:0}
+.row .d{font-family:'Chakra Petch',sans-serif;font-style:italic;font-weight:600;color:var(--mu)}
+.row .s{font-size:13px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px}
+.row .m{font-size:18px}
+.row svg{justify-self:end}
+.cat2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.catb{height:56px;border:1px solid var(--line);border-radius:14px;background:var(--panel);font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px}
+.catb.on{background:var(--cy);border-color:var(--cy);color:var(--cyi);font-weight:700}
+.calhead{display:flex;justify-content:space-between;align-items:center}
+.iconbtn{width:44px;height:44px;border:1px solid var(--line);border-radius:14px;display:flex;align-items:center;justify-content:center}
+.stats{padding:14px 16px 12px;display:flex;flex-direction:column;gap:12px;border-radius:18px}
+.stat .v{font-size:50px;line-height:.85;color:var(--cy)}
+.stat .v span{font-size:15px;color:var(--tx)}
+.bars{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;height:64px;font-size:11px;color:var(--mu);text-align:center}
+.bars>div{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px}
+.bar{width:100%;border-radius:5px;background:var(--dash)}
+.bar.now{background:transparent;border:1.5px dashed var(--cy)}
+.dow,.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.dow{font-size:11px;letter-spacing:.04em;color:var(--mu);text-align:center}
+.day{height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-style:italic;font-weight:600;font-size:15px}
+.day.t{background:var(--cy);color:var(--cyi);font-weight:700}
+.day.s{background:var(--lv);color:var(--lvi);font-weight:700}
+.day.b{background:linear-gradient(135deg,var(--cy) 50%,var(--lv) 50%);color:var(--cyi);font-weight:700}
+.day.fut{color:var(--mu)}
+.day.sel{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--tx)}
+.day .td{border-bottom:2px solid currentColor;line-height:1.1}
+.legend{display:flex;justify-content:space-between;align-items:center;font-size:11px;gap:6px;flex-wrap:wrap}
+.legend>div{display:flex;align-items:center;gap:6px}
+.sw{width:16px;height:16px;border-radius:5px}
+.detail{display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--line);padding-top:10px;font-size:13px}
+.drow{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:8px;align-items:center;min-height:40px;text-align:left;width:100%}
+.link{color:var(--cy);font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:6px;min-height:40px}
+.signout{align-self:center;font-size:12px;color:var(--mu);min-height:44px;padding:0 12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 96px);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:13px;font-weight:700;z-index:20;max-width:90vw;text-align:center}
+.demo{position:fixed;top:calc(env(safe-area-inset-top) + 2px);right:8px;font-size:10px;letter-spacing:.08em;color:var(--lv);border:1px solid rgba(185,168,255,.45);border-radius:6px;padding:2px 6px;z-index:20;background:var(--bg)}
+.err{color:var(--dg);font-size:13px;min-height:18px}
+.chart{padding:14px 12px 6px}
+.chart svg{display:block;width:100%;height:auto;font-family:'Chakra Petch',sans-serif;font-style:italic}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script type="module">
+// ============================================================
+// Firebase settings: paste the values from your Firebase project here.
+// While apiKey starts with "YOUR_", the app runs in DEMO mode
+// (sample data, saved only in this browser).
+// ============================================================
+const FB_CONFIG = {
+  apiKey: "AIzaSyDIjnZ3MCKsL0Vc5wqFjCmOC7_Nc1Kk-yY",
+  authDomain: "lift-log-23214.firebaseapp.com",
+  projectId: "lift-log-23214",
+  storageBucket: "lift-log-23214.firebasestorage.app",
+  messagingSenderId: "375460085663",
+  appId: "1:375460085663:web:ec1926d45dc0243fbcc7aa"
+};
+const DEMO = String(FB_CONFIG.apiKey).startsWith('YOUR_');
+
+const CATS = ['Chest', 'Back', 'Shoulders', 'Legs', 'Other'];
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DOW = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+const DAY_START_HOUR = 4; // the day switches at 4:00 AM
+
+// ---------- date helpers (dates are 'YYYY-MM-DD' strings in local time) ----------
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parse = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const today = () => ymd(new Date(Date.now() - DAY_START_HOUR * 3600e3));
+const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return ymd(d); };
+const mondayOf = s => { const d = parse(s); d.setDate(d.getDate() - (d.getDay() + 6) % 7); return ymd(d); };
+const daysBetween = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
+const fmtShort = s => { const d = parse(s); return `${MON[d.getMonth()]} ${d.getDate()}`; };
+const fmtHead = s => { const d = parse(s); return `${pad(d.getMonth() + 1)}.${pad(d.getDate())} ${DOW[d.getDay()]}`; };
+const fmtMD = s => { const d = parse(s); return `${pad(d.getMonth() + 1)}/${pad(d.getDate())}`; };
+const fmtKg = v => (Math.round(v * 10) / 10).toFixed(1);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+
+// ---------- icons ----------
+const I = {
+  back: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
+  next: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>',
+  plus: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="#3DF2E0" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>`,
+  check: (c, s = 18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,
+  x: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  pen: (s = 16) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/></svg>`,
+};
+
+// ---------- state ----------
+const S = {
+  authReady: false, user: null, login: { email: '', pw: '' }, loginErr: '', busy: false,
+  exercises: [], logs: [], stretch: {},
+  route: { name: 'home' }, cat: 'All', range: '3M', calMonth: null, calSel: null,
+  form: null, toast: ''
+};
+let api = null;
+
+// ---------- derived data ----------
+const exById = id => S.exercises.find(e => e.id === id);
+const activeEx = () => S.exercises.filter(e => !e.archived).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+const logsOf = id => S.logs.filter(l => l.exerciseId === id).sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+const trainSet = () => new Set(S.logs.map(l => l.date));
+const exName = l => (exById(l.exerciseId) || {}).name || l.name || 'Exercise';
+
+// ---------- UI helpers ----------
+let toastTimer;
+function toast(msg) { S.toast = msg; render(); clearTimeout(toastTimer); toastTimer = setTimeout(() => { S.toast = ''; render(); }, 2400); }
+function onErr(e) {
+  console.error(e);
+  const code = e && e.code || '';
+  toast(code === 'permission-denied' ? 'Permission denied. Check the Firestore rules.' : 'Sync error: ' + (code || (e && e.message) || 'unknown'));
+}
+function go(route) { S.route = route; window.scrollTo(0, 0); render(); }
+
+// ---------- views ----------
+function vLogin() {
+  return `<main class="screen form center" style="gap:20px">
+    <div class="logo num" style="font-size:52px">LIFT<span class="cy">/</span>LOG</div>
+    <form data-submit="login" style="width:100%;max-width:360px;display:flex;flex-direction:column;gap:14px">
+      <div class="fieldset"><label class="label" for="em">EMAIL</label>
+        <input class="field" id="em" type="email" autocomplete="username" data-in="email" value="${esc(S.login.email)}"></div>
+      <div class="fieldset"><label class="label" for="pw">PASSWORD</label>
+        <input class="field" id="pw" type="password" autocomplete="current-password" data-in="pw" value="${esc(S.login.pw)}"></div>
+      <div class="err" role="alert">${esc(S.loginErr)}</div>
+      <button class="btn" type="submit" ${S.busy ? 'disabled' : ''}>${S.busy ? 'Signing in…' : 'Sign in'}</button>
+    </form>
+  </main>`;
+}
+
+function tabbar(on) {
+  return `<nav class="tabbar"><div class="tabs">
+    <button data-act="tab" data-to="home" class="${on === 'home' ? 'on' : ''}">Exercises</button>
+    <button data-act="tab" data-to="calendar" class="${on === 'calendar' ? 'on' : ''}">Calendar</button>
+  </div></nav>`;
+}
+
+function vHome() {
+  const t = today();
+  const list = activeEx().filter(e => S.cat === 'All' || e.category === S.cat);
+  const tiles = list.map(e => {
+    const ls = logsOf(e.id), last = ls[ls.length - 1], isT = last && last.date === t;
+    const sub = !last ? 'No logs yet' : isT ? `Today's max · ${last.sets.length} sets` : `${fmtShort(last.date)} · ${last.sets.length} sets`;
+    return `<button class="tile ${isT ? 'today' : ''}" data-act="openHist" data-long="1" data-ex="${esc(e.id)}">
+      <span class="col"><span class="nm">${esc(e.name)}</span><span class="cat">${esc((e.category || 'Other').toUpperCase())}</span></span>
+      <span class="col"><span class="big num">${last ? fmtKg(last.max) : '—'}<span class="u"> kg</span></span><span class="sub">${sub}</span></span>
+    </button>`;
+  }).join('');
+  const done = !!S.stretch[t];
+  return `<main class="screen">
+    <div class="head"><h1 class="logo num">LIFT<span class="cy">/</span>LOG</h1><div class="date num">${fmtHead(t)}</div></div>
+    <div class="chips" role="tablist" aria-label="Category">
+      ${['All', ...CATS].map(c => `<button class="chip ${S.cat === c ? 'on' : ''}" data-act="cat" data-cat="${c}" role="tab" aria-selected="${S.cat === c}">${c}</button>`).join('')}
+    </div>
+    <div class="grid2">
+      ${tiles}
+      ${!list.length && activeEx().length ? `<div class="empty">No exercises in ${esc(S.cat)} yet.</div>` : ''}
+      <button class="tile add" data-act="addEx">${I.plus(28)}Add exercise</button>
+    </div>
+    <div class="stretch">
+      <div class="t">Stretch</div>
+      <button class="switch ${done ? 'on' : ''}" role="switch" aria-checked="${done}" aria-label="Stretched today" data-act="stretch" data-date="${t}">
+        <span class="knob">${done ? I.check('#E4DDFF') : ''}</span>
+      </button>
+    </div>
+    ${!activeEx().length ? `<div class="empty">Tap “Add exercise” to create your first one. Long-press a tile later to rename it or change its category.</div>` : ''}
+  </main>${tabbar('home')}`;
+}
+
+function vRecord() {
+  const f = S.form, t = today();
+  const name = (exById(f.exId) || {}).name || f.name || 'Exercise';
+  const ws = f.sets.map(s => parseFloat(String(s.w).replace(',', '.')));
+  const valid = ws.filter(w => !isNaN(w));
+  const max = valid.length ? Math.max(...valid) : null;
+  const maxIdx = max === null ? -1 : ws.indexOf(max);
+  const title = f.origDate && f.origDate !== t ? 'Edit Log' : (f.date === t ? "Today's Log" : 'Log');
+  const rows = f.sets.map((s, i) => `<div class="setrow">
+      <div class="setno num ${i === maxIdx ? 'max' : ''}">${i + 1}</div>
+      <input class="setin ${i === maxIdx ? 'max' : ''}" id="w${i}" data-set="${i}" data-k="w" type="text" inputmode="decimal" aria-label="Set ${i + 1} weight" value="${esc(s.w)}" placeholder="0">
+      <input class="setin" id="r${i}" data-set="${i}" data-k="r" type="text" inputmode="numeric" aria-label="Set ${i + 1} reps" value="${esc(s.r)}" placeholder="0">
+      <button class="x" data-act="delSet" data-i="${i}" aria-label="Delete set ${i + 1}">${I.x}</button>
+    </div>`).join('');
+  return `<main class="screen form">
+    <button class="back" data-act="back">${I.back}${esc(name)}</button>
+    <div class="titlerow"><h1 class="t">${title}</h1>
+      <input class="datefield" id="logdate" type="date" data-in="date" max="${t}" value="${f.date}" aria-label="Date"></div>
+    <div class="sethead"><div>SET</div><div>WEIGHT kg</div><div>REPS</div><div></div></div>
+    <div style="display:flex;flex-direction:column;gap:8px">${rows}</div>
+    <button class="btn dash" data-act="addSet">${I.plus(20)}Add set</button>
+    <div class="panel sumcard">
+      <div style="display:flex;flex-direction:column;gap:2px"><div style="font-size:13px;font-weight:700">Max weight${f.date === t ? ' today' : ' this day'}</div><div class="mu" style="font-size:11px">This value goes on the graph</div></div>
+      <div class="num" style="font-size:34px;color:var(--cy)"><span id="maxv">${max === null ? '—' : fmtKg(max)}</span><span class="mu" style="font-size:14px"> kg</span></div>
+    </div>
+    <div class="actions ${f.origDate ? '' : 'one'}">
+      ${f.origDate ? '<button class="btn danger" data-act="delLog">Delete log</button>' : ''}
+      <button class="btn" data-act="saveLog">${f.origDate ? 'Save changes' : 'Save'}</button>
+    </div>
+  </main>`;
+}
+
+function niceStep(span) {
+  const steps = [1, 2, 2.5, 5, 10, 20, 25, 50, 100];
+  return steps.find(s => span / s <= 4) || 100;
+}
+function chart(points) {
+  if (!points.length) return `<div class="mu" style="font-size:13px;padding:40px 0;text-align:center">No logs in this range yet.</div>`;
+  const vals = points.map(p => p.max);
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  const step = niceStep(Math.max(hi - lo, 1));
+  lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
+  if (hi === lo) { lo -= step; hi += step; }
+  const X0 = 36, X1 = 338, Y0 = 40, Y1 = 152, base = 184;
+  const span = daysBetween(points[0].date, points[points.length - 1].date);
+  const x = p => span === 0 ? (X0 + X1) / 2 : X0 + (X1 - X0) * daysBetween(points[0].date, p.date) / span;
+  const y = v => Y1 - (Y1 - Y0) * (v - lo) / (hi - lo);
+  const ticks = []; for (let v = lo; v <= hi + 1e-9; v += step) ticks.push(v);
+  const pts = points.map(p => `${x(p).toFixed(1)},${y(p.max).toFixed(1)}`).join(' ');
+  const last = points[points.length - 1];
+  const lx = x(last), ly = y(last.max);
+  const midDate = span > 0 ? addDays(points[0].date, Math.round(span / 2)) : null;
+  const tickLabel = v => Number.isInteger(v) ? v : v.toFixed(1);
+  return `<svg viewBox="0 0 350 220" role="img" aria-label="Daily max weight from ${fmtShort(points[0].date)} to ${fmtShort(last.date)}, latest ${fmtKg(last.max)} kg">
+    <g stroke="#2A2F63" stroke-width="1">${ticks.map(v => `<line x1="36" y1="${y(v).toFixed(1)}" x2="350" y2="${y(v).toFixed(1)}"/>`).join('')}</g>
+    <line x1="36" y1="${base}" x2="350" y2="${base}" stroke="#5A62B0" stroke-width="1"/>
+    <g font-size="12" fill="#9AA0D0">
+      <text x="0" y="14">kg · daily max weight</text>
+      ${ticks.map(v => `<text x="0" y="${(y(v) + 4).toFixed(1)}">${tickLabel(v)}</text>`).join('')}
+      ${span > 0 ? `<text x="36" y="206">${fmtShort(points[0].date)}</text><text x="187" y="206" text-anchor="middle">${fmtShort(midDate)}</text>` : ''}
+      <text x="338" y="206" text-anchor="end">${fmtShort(last.date)}</text>
+    </g>
+    ${points.length > 1 ? `<polygon points="${pts} ${lx.toFixed(1)},${base} ${x(points[0]).toFixed(1)},${base}" fill="#3DF2E0" fill-opacity="0.12"/>
+    <polyline points="${pts}" fill="none" stroke="#3DF2E0" stroke-width="3" stroke-linejoin="round"/>` : ''}
+    <g fill="#0B0D26" stroke="#3DF2E0" stroke-width="2">${points.slice(0, -1).map(p => `<circle cx="${x(p).toFixed(1)}" cy="${y(p.max).toFixed(1)}" r="3.5"/>`).join('')}</g>
+    <circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="11" fill="#3DF2E0" fill-opacity="0.25"/>
+    <circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="6" fill="#EEF0FF"/>
+    <text x="${Math.max(lx - 18, 60).toFixed(1)}" y="${Math.max(ly - 10, 26).toFixed(1)}" text-anchor="end" font-size="14" font-weight="700" fill="#EEF0FF">${fmtKg(last.max)}</text>
+  </svg>`;
+}
+
+function vHistory() {
+  const e = exById(S.route.exId);
+  if (!e) return vHome();
+  const all = logsOf(e.id), t = today();
+  const from = S.range === '1M' ? addDays(t, -30) : S.range === '3M' ? addDays(t, -91) : '0000-00-00';
+  const pts = all.filter(l => l.date >= from);
+  const last = all[all.length - 1];
+  const delta = pts.length > 1 ? pts[pts.length - 1].max - pts[0].max : null;
+  const rows = all.slice().reverse().slice(0, 30).map(l => `<button class="row" data-act="editLog" data-ex="${esc(e.id)}" data-date="${l.date}">
+      <span class="d">${fmtMD(l.date)}</span><span class="s">${l.sets.map(s => fmtKg(s.w)).join(' / ')}</span>
+      <span class="m num">${fmtKg(l.max)} kg</span>${I.pen()}</button>`).join('');
+  return `<main class="screen form">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <button class="back" data-act="tab" data-to="home">${I.back}Exercises</button>
+      <button class="link" data-act="editEx" data-ex="${esc(e.id)}">${I.pen(14)}Edit exercise</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <h1 style="margin:0;font-size:18px;font-weight:700">${esc(e.name)}</h1>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:8px">
+        <div class="num" style="font-size:84px;line-height:.9;letter-spacing:-.02em">${last ? fmtKg(last.max) : '—'}<span class="mu" style="font-size:20px;letter-spacing:0"> kg</span></div>
+        ${delta !== null ? `<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding-bottom:4px">
+          <div class="num cy" style="font-size:22px">${delta >= 0 ? '+' : '−'}${fmtKg(Math.abs(delta))} kg</div>
+          <div class="mu" style="font-size:11px">since ${fmtShort(pts[0].date)}</div></div>` : ''}
+      </div>
+    </div>
+    <div class="seg" role="tablist" aria-label="Range">
+      ${[['1M', '1M'], ['3M', '3M'], ['ALL', 'All']].map(([k, l]) => `<button class="${S.range === k ? 'on' : ''}" data-act="range" data-r="${k}" role="tab" aria-selected="${S.range === k}">${l}</button>`).join('')}
+    </div>
+    <div class="panel chart">${chart(pts)}</div>
+    ${rows ? `<div class="rows">${rows}</div>` : ''}
+    <button class="btn" style="margin-top:auto" data-act="record" data-ex="${esc(e.id)}">Add today's log</button>
+  </main>`;
+}
+
+function weekCounts(t) {
+  const train = trainSet(), thisMon = mondayOf(t), out = [];
+  for (let k = 4; k >= 0; k--) {
+    const mon = addDays(thisMon, -7 * k);
+    let c = 0; for (let i = 0; i < 7; i++) { const d = addDays(mon, i); if (d <= t && train.has(d)) c++; }
+    out.push({ mon, c, now: k === 0 });
+  }
+  return out;
+}
+
+function vCalendar() {
+  const t = today();
+  if (!S.calMonth) S.calMonth = t.slice(0, 7);
+  if (!S.calSel) S.calSel = t;
+  const [Y, M] = S.calMonth.split('-').map(Number);
+  const first = new Date(Y, M - 1, 1), dim = new Date(Y, M, 0).getDate();
+  const lead = (first.getDay() + 6) % 7;
+  const train = trainSet();
+  let tOnly = 0, sOnly = 0, both = 0;
+  const cells = [];
+  for (let i = 0; i < lead; i++) cells.push('<div></div>');
+  for (let d = 1; d <= dim; d++) {
+    const ds = `${Y}-${pad(M)}-${pad(d)}`, tr = train.has(ds), st = !!S.stretch[ds];
+    const cls = tr && st ? 'b' : tr ? 't' : st ? 's' : (ds > t ? 'fut' : '');
+    if (tr && st) both++; else if (tr) tOnly++; else if (st) sOnly++;
+    const kind = tr && st ? 'training and stretch' : tr ? 'training' : st ? 'stretch' : 'no activity';
+    cells.push(`<button class="day ${cls} ${ds === S.calSel ? 'sel' : ''}" data-act="selDay" data-date="${ds}" aria-label="${MON[M - 1]} ${d}, ${kind}" ${ds > t ? 'disabled' : ''}>${ds === t ? `<span class="td">${d}</span>` : d}</button>`);
+  }
+  const sessions = tOnly + both;
+  const wk = weekCounts(t);
+  const done4 = wk.slice(0, 4);
+  const pace = done4.reduce((a, w) => a + w.c, 0) / 4;
+  const scale = 32 / Math.max(4, ...wk.map(w => w.c));
+  const isCur = S.calMonth === t.slice(0, 7);
+  const sel = S.calSel, selLogs = S.logs.filter(l => l.date === sel), selSt = !!S.stretch[sel];
+  const sd = parse(sel);
+  return `<main class="screen">
+    <div class="calhead">
+      <button class="iconbtn" data-act="month" data-d="-1" aria-label="Previous month">${I.back}</button>
+      <h1 style="margin:0;font-size:18px;font-weight:700">${['January','February','March','April','May','June','July','August','September','October','November','December'][M - 1]} ${Y}</h1>
+      <button class="iconbtn" data-act="month" data-d="1" aria-label="Next month" ${isCur ? 'disabled style="opacity:.35"' : ''}>${I.next}</button>
+    </div>
+    <div class="panel stats">
+      <div class="grid2" style="gap:12px">
+        <div class="stat" style="display:flex;flex-direction:column;gap:6px"><div class="label">${isCur ? 'THIS MONTH' : MON[M - 1].toUpperCase() + ' TOTAL'}</div><div class="v num">${sessions}<span> sessions</span></div></div>
+        <div class="stat" style="display:flex;flex-direction:column;gap:6px"><div class="label">WEEKLY PACE</div><div class="v num">${pace.toFixed(1)}<span> / week</span></div></div>
+      </div>
+      <div style="height:1px;background:var(--line)"></div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mu)"><div class="label">SESSIONS PER WEEK</div><div>Mon start · pace = last 4 wks</div></div>
+        <div class="bars">${wk.map(w => `<div style="${w.now ? 'color:var(--cy);font-weight:700' : ''}">
+          <div class="num" style="font-size:13px;${w.now ? '' : 'color:var(--tx)'}">${w.c}</div>
+          <div class="bar ${w.now ? 'now' : ''}" style="height:${Math.max(w.c * scale, 3).toFixed(0)}px"></div>${w.now ? 'This wk' : fmtShort(w.mon)}</div>`).join('')}</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;padding-top:4px">
+      <div class="dow"><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div></div>
+      <div class="cal">${cells.join('')}</div>
+    </div>
+    <div class="legend">
+      <div><div class="sw" style="background:var(--cy)"></div>Training only · ${tOnly}</div>
+      <div><div class="sw" style="background:var(--lv)"></div>Stretch only · ${sOnly}</div>
+      <div><div class="sw" style="background:linear-gradient(135deg,var(--cy) 50%,var(--lv) 50%)"></div>Both · ${both}</div>
+    </div>
+    <div class="detail">
+      <div class="label" style="padding-bottom:2px">${sel === t ? 'TODAY · ' : ''}${DOW[sd.getDay()]}, ${MON[sd.getMonth()].toUpperCase()} ${sd.getDate()}</div>
+      ${selLogs.length ? selLogs.map(l => `<button class="drow" data-act="editLog" data-ex="${esc(l.exerciseId)}" data-date="${l.date}">
+          <span class="cy" style="font-weight:700">Training</span><span>${esc(exName(l))} <span class="num mu">${fmtKg(l.max)} kg</span></span><span class="link">${I.pen(14)}Edit</span></button>`).join('')
+        : `<div class="drow"><span class="cy" style="font-weight:700">Training</span><span class="mu">—</span><span></span></div>`}
+      <button class="drow" data-act="stretch" data-date="${sel}"><span style="color:var(--lv);font-weight:700">Stretch</span><span>${selSt ? 'Done' : '<span class="mu">Not done</span>'}</span><span class="link">${selSt ? 'Undo' : 'Mark done'}</span></button>
+    </div>
+    <button class="signout" data-act="logout">${DEMO ? 'Reset demo data' : 'Sign out'}</button>
+  </main>${tabbar('calendar')}`;
+}
+
+function vExForm() {
+  const f = S.form, isNew = !f.exId;
+  return `<main class="screen form" style="gap:20px">
+    <button class="back" data-act="back">${I.back}${isNew ? 'Exercises' : esc((exById(f.exId) || {}).name || 'Back')}</button>
+    <h1 class="t">${isNew ? 'New Exercise' : 'Edit Exercise'}</h1>
+    <div class="fieldset"><label class="label" for="exname">NAME</label>
+      <input class="field" id="exname" type="text" data-in="exname" value="${esc(f.name)}" placeholder="e.g. Incline Dumbbell Press" autocomplete="off"></div>
+    <div class="fieldset"><div class="label">CATEGORY</div>
+      <div class="cat2" role="radiogroup" aria-label="Category">
+        ${CATS.map(c => `<button class="catb ${f.category === c ? 'on' : ''}" role="radio" aria-checked="${f.category === c}" data-act="pickCat" data-cat="${c}">${f.category === c ? I.check('currentColor', 16) : ''}${c}</button>`).join('')}
+      </div>
+      <div class="mu" style="font-size:12px">${isNew ? 'You can change the category later.' : 'Your logs stay when you rename, recategorize or delete.'}</div>
+    </div>
+    <div class="actions ${isNew ? 'one' : ''}">
+      ${isNew ? '' : '<button class="btn danger" data-act="archiveEx">Delete</button>'}
+      <button class="btn" data-act="saveEx">${isNew ? 'Add exercise' : 'Save changes'}</button>
+    </div>
+  </main>`;
+}
+
+function render() {
+  const app = document.getElementById('app');
+  const ae = document.activeElement, aeId = ae && ae.id;
+  let selS = null, selE = null; try { selS = ae.selectionStart; selE = ae.selectionEnd; } catch (e) {}
+  let h;
+  if (!S.authReady) h = `<main class="screen form center"><div class="logo num">LIFT<span class="cy">/</span>LOG</div></main>`;
+  else if (!S.user) h = vLogin();
+  else {
+    const r = S.route.name;
+    h = r === 'record' && S.form ? vRecord() : r === 'history' ? vHistory() : r === 'calendar' ? vCalendar() : (r === 'exForm' && S.form) ? vExForm() : vHome();
+  }
+  app.innerHTML = h + (S.toast ? `<div class="toast" role="status">${esc(S.toast)}</div>` : '') + (DEMO && S.authReady ? '<div class="demo">DEMO · this device only</div>' : '');
+  if (aeId) { const el = document.getElementById(aeId); if (el && el.tagName === 'INPUT') { el.focus({ preventScroll: true }); try { if (selS !== null) el.setSelectionRange(selS, selE); } catch (e) {} } }
+}
+
+// ---------- actions ----------
+function openRecord(exId, date, back) {
+  const id = `${date}_${exId}`, existing = S.logs.find(l => l.id === id);
+  let sets;
+  if (existing) sets = existing.sets.map(s => ({ w: fmtKg(s.w), r: String(s.r) }));
+  else {
+    const prev = logsOf(exId).pop();
+    sets = prev ? prev.sets.map(s => ({ w: fmtKg(s.w), r: String(s.r) })) : [{ w: '', r: '' }];
+  }
+  S.form = { kind: 'log', exId, date, origDate: existing ? date : null, sets, name: (exById(exId) || {}).name || (existing && existing.name) || '', back };
+  go({ name: 'record' });
+}
+
+function saveLog() {
+  const f = S.form, t = today();
+  const sets = f.sets.map(s => ({ w: parseFloat(String(s.w).replace(',', '.')), r: parseInt(s.r, 10) }))
+    .filter(s => !isNaN(s.w) && s.w >= 0 && s.r > 0);
+  if (!sets.length) return toast('Enter at least one set with weight and reps.');
+  if (!f.date || f.date > t) return toast('Pick a date up to today.');
+  const id = `${f.date}_${f.exId}`;
+  let all = sets;
+  if (f.origDate !== f.date) { const other = S.logs.find(l => l.id === id); if (other) all = other.sets.concat(sets); }
+  const max = Math.max(...all.map(s => s.w));
+  api.put('logs', id, { exerciseId: f.exId, name: f.name, date: f.date, sets: all, max, updatedAt: Date.now() });
+  if (f.origDate && f.origDate !== f.date) api.del('logs', `${f.origDate}_${f.exId}`);
+  const back = f.back; S.form = null; go(back || { name: 'home' }); toast('Saved');
+}
+
+function openExForm(exId, back) {
+  const e = exId ? exById(exId) : null;
+  S.form = { kind: 'ex', exId: e ? e.id : null, name: e ? e.name : '', category: e ? e.category : (S.cat !== 'All' ? S.cat : 'Chest'), back };
+  go({ name: 'exForm' });
+}
+
+function saveEx() {
+  const f = S.form, name = f.name.trim();
+  if (!name) return toast('Enter a name.');
+  if (f.exId) { const e = exById(f.exId); api.put('exercises', f.exId, { ...strip(e), name, category: f.category }); }
+  else api.put('exercises', uid(), { name, category: f.category, createdAt: Date.now(), archived: false });
+  const back = f.back; S.form = null; go(back || { name: 'home' }); toast(f.exId ? 'Saved' : 'Exercise added');
+}
+const strip = o => { const { id, ...rest } = o || {}; return rest; };
+
+const ACT = {
+  tab: el => { S.form = null; go({ name: el.dataset.to }); },
+  cat: el => { S.cat = el.dataset.cat; render(); },
+  openHist: el => go({ name: 'history', exId: el.dataset.ex }),
+  addEx: () => openExForm(null, { name: 'home' }),
+  editEx: el => openExForm(el.dataset.ex, { ...S.route }),
+  pickCat: el => { S.form.category = el.dataset.cat; render(); },
+  saveEx,
+  archiveEx: () => {
+    const e = exById(S.form.exId);
+    if (!e || !confirm(`Delete “${e.name}”? Its past logs stay in the calendar.`)) return;
+    api.put('exercises', e.id, { ...strip(e), archived: true });
+    S.form = null; go({ name: 'home' }); toast('Exercise deleted');
+  },
+  stretch: el => { const d = el.dataset.date; if (S.stretch[d]) api.del('stretch', d); else api.put('stretch', d, { done: true, at: Date.now() }); },
+  range: el => { S.range = el.dataset.r; render(); },
+  record: el => openRecord(el.dataset.ex, today(), { ...S.route }),
+  editLog: el => openRecord(el.dataset.ex, el.dataset.date, { ...S.route }),
+  back: () => { const b = S.form && S.form.back; S.form = null; go(b || { name: 'home' }); },
+  addSet: () => { const l = S.form.sets[S.form.sets.length - 1]; S.form.sets.push(l ? { ...l } : { w: '', r: '' }); render(); },
+  delSet: el => { S.form.sets.splice(+el.dataset.i, 1); if (!S.form.sets.length) S.form.sets.push({ w: '', r: '' }); render(); },
+  saveLog,
+  delLog: () => {
+    const f = S.form;
+    if (!confirm('Delete this log?')) return;
+    api.del('logs', `${f.origDate}_${f.exId}`);
+    const back = f.back; S.form = null; go(back || { name: 'home' }); toast('Log deleted');
+  },
+  month: el => { const [y, m] = S.calMonth.split('-').map(Number); const d = new Date(y, m - 1 + (+el.dataset.d), 1); S.calMonth = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; render(); },
+  selDay: el => { S.calSel = el.dataset.date; render(); },
+  logout: () => {
+    if (DEMO) { if (confirm('Reset the demo data?')) { try { localStorage.removeItem('liftlog-demo'); } catch (e) {} location.reload(); } return; }
+    if (confirm('Sign out?')) api.logout();
+  },
+};
+
+// long-press on a tile -> edit exercise
+let lpTimer = null, lpFired = false, lpStart = null;
+document.addEventListener('pointerdown', e => {
+  const el = e.target.closest('[data-long]'); lpFired = false; if (!el) return;
+  lpStart = [e.clientX, e.clientY];
+  lpTimer = setTimeout(() => { lpFired = true; if (navigator.vibrate) navigator.vibrate(10); openExForm(el.dataset.ex, { name: 'home' }); }, 550);
+});
+const lpCancel = () => { clearTimeout(lpTimer); lpTimer = null; };
+document.addEventListener('pointerup', lpCancel);
+document.addEventListener('pointercancel', lpCancel);
+document.addEventListener('pointermove', e => { if (lpStart && Math.hypot(e.clientX - lpStart[0], e.clientY - lpStart[1]) > 10) lpCancel(); });
+document.addEventListener('contextmenu', e => { if (e.target.closest('[data-long]')) e.preventDefault(); });
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
+  if (lpFired) { lpFired = false; e.preventDefault(); return; }
+  const fn = ACT[el.dataset.act]; if (fn) { e.preventDefault(); fn(el); }
+});
+
+document.addEventListener('input', e => {
+  const el = e.target;
+  if (el.dataset.set !== undefined && S.form) {
+    S.form.sets[+el.dataset.set][el.dataset.k] = el.value;
+    if (el.dataset.k === 'w') {
+      const ws = S.form.sets.map(s => parseFloat(String(s.w).replace(',', '.')));
+      const v = ws.filter(w => !isNaN(w)), max = v.length ? Math.max(...v) : null, mi = max === null ? -1 : ws.indexOf(max);
+      const mv = document.getElementById('maxv'); if (mv) mv.textContent = max === null ? '—' : fmtKg(max);
+      document.querySelectorAll('[data-k="w"]').forEach((n, i) => n.classList.toggle('max', i === mi));
+      document.querySelectorAll('.setno').forEach((n, i) => n.classList.toggle('max', i === mi));
+    }
+    return;
+  }
+  const k = el.dataset.in; if (!k) return;
+  if (k === 'email') S.login.email = el.value;
+  else if (k === 'pw') S.login.pw = el.value;
+  else if (k === 'exname') S.form.name = el.value;
+  else if (k === 'date') { S.form.date = el.value; }
+});
+
+document.addEventListener('submit', async e => {
+  if (e.target.dataset.submit !== 'login') return;
+  e.preventDefault();
+  if (!S.login.email || !S.login.pw) { S.loginErr = 'Enter your email and password.'; return render(); }
+  S.busy = true; S.loginErr = ''; render();
+  try { await api.login(S.login.email.trim(), S.login.pw); S.login.pw = ''; }
+  catch (err) {
+    const c = err && err.code || '';
+    S.loginErr = /invalid-credential|wrong-password|user-not-found|invalid-email/.test(c) ? 'Email or password is incorrect.'
+      : c === 'auth/too-many-requests' ? 'Too many attempts. Try again later.'
+      : c === 'auth/network-request-failed' ? 'No connection. Check your network.' : 'Sign-in failed: ' + c;
+  }
+  S.busy = false; render();
+});
+
+document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
+
+// ---------- data backends ----------
+async function initFirebase() {
+  const B = 'https://www.gstatic.com/firebasejs/10.12.2/';
+  const [appM, authM, fsM] = await Promise.all([import(B + 'firebase-app.js'), import(B + 'firebase-auth.js'), import(B + 'firebase-firestore.js')]);
+  const app = appM.initializeApp(FB_CONFIG);
+  const auth = authM.getAuth(app);
+  try { await authM.setPersistence(auth, authM.indexedDBLocalPersistence); } catch (e) {}
+  let db;
+  try { db = fsM.initializeFirestore(app, { localCache: fsM.persistentLocalCache({ tabManager: fsM.persistentMultipleTabManager() }) }); }
+  catch (e) { db = fsM.getFirestore(app); }
+  const ref = (col, id) => fsM.doc(db, 'users', S.user.uid, col, id);
+  api = {
+    login: (em, pw) => authM.signInWithEmailAndPassword(auth, em, pw),
+    logout: () => authM.signOut(auth),
+    put: (col, id, data) => { fsM.setDoc(ref(col, id), data).catch(onErr); },
+    del: (col, id) => { fsM.deleteDoc(ref(col, id)).catch(onErr); },
+  };
+  let unsubs = [];
+  authM.onAuthStateChanged(auth, u => {
+    unsubs.forEach(f => f()); unsubs = [];
+    S.user = u ? { uid: u.uid, email: u.email } : null;
+    S.exercises = []; S.logs = []; S.stretch = {}; S.authReady = true;
+    if (u) {
+      const col = c => fsM.collection(db, 'users', u.uid, c);
+      unsubs.push(fsM.onSnapshot(col('exercises'), qs => { S.exercises = qs.docs.map(d => ({ ...d.data(), id: d.id })); render(); }, onErr));
+      unsubs.push(fsM.onSnapshot(col('logs'), qs => { S.logs = qs.docs.map(d => ({ ...d.data(), id: d.id })); render(); }, onErr));
+      unsubs.push(fsM.onSnapshot(col('stretch'), qs => { S.stretch = Object.fromEntries(qs.docs.map(d => [d.id, true])); render(); }, onErr));
+    }
+    render();
+  });
+}
+
+function demoSeed() {
+  const t = today(), now = Date.now();
+  const ex = [['Bench Press', 'Chest'], ['Squat', 'Legs'], ['Deadlift', 'Back'], ['Lat Pulldown', 'Back'], ['Shoulder Press', 'Shoulders']]
+    .map(([name, category], i) => ({ id: 'ex' + i, name, category, createdAt: now + i, archived: false }));
+  const logs = [];
+  const add = (exI, off, ws, r) => { const date = addDays(t, off); logs.push({ id: `${date}_ex${exI}`, exerciseId: 'ex' + exI, name: ex[exI].name, date, sets: ws.map(w => ({ w, r })), max: Math.max(...ws), updatedAt: now }); };
+  [[-56, 70], [-49, 72.5], [-42, 72.5], [-35, 75], [-28, 75], [-21, 77.5], [-7, 77.5], [0, 80]].forEach(([o, m]) => add(0, o, [m - 5, m - 2.5, m], 8));
+  [[-54, 90], [-40, 95], [-26, 97.5], [-12, 100], [-2, 100]].forEach(([o, m]) => add(1, o, [m, m, m, m, m], 5));
+  [[-47, 110], [-19, 115], [-4, 120]].forEach(([o, m]) => add(2, o, [m, m, m], 5));
+  [[-49, 50], [-21, 52.5], [0, 55]].forEach(([o, m]) => add(3, o, [m, m, m], 10));
+  [[-33, 35], [-11, 37.5], [-2, 40]].forEach(([o, m]) => add(4, o, [m, m, m], 8));
+  const stretch = {}; [-1, -2, -5, -6, -9, -13, -15, 0].forEach(o => stretch[addDays(t, o)] = true);
+  return { exercises: ex, logs, stretch };
+}
+
+function initDemo() {
+  const K = 'liftlog-demo';
+  let d = null; try { d = JSON.parse(localStorage.getItem(K)); } catch (e) {}
+  if (!d) d = demoSeed();
+  Object.assign(S, d, { user: { uid: 'demo', email: 'demo' }, authReady: true });
+  const save = () => { try { localStorage.setItem(K, JSON.stringify({ exercises: S.exercises, logs: S.logs, stretch: S.stretch })); } catch (e) {} };
+  api = {
+    login: async () => {}, logout: async () => {},
+    put: (col, id, data) => {
+      if (col === 'stretch') S.stretch[id] = true;
+      else { const arr = S[col], i = arr.findIndex(x => x.id === id), v = { ...data, id }; if (i >= 0) arr[i] = v; else arr.push(v); }
+      save(); render();
+    },
+    del: (col, id) => { if (col === 'stretch') delete S.stretch[id]; else S[col] = S[col].filter(x => x.id !== id); save(); render(); },
+  };
+  render();
+}
+
+render();
+if (DEMO) initDemo();
+else initFirebase().catch(e => { console.error(e); S.authReady = true; S.loginErr = 'Could not load Firebase. Check your connection.'; render(); });
+</script>
+</body>
+</html>
